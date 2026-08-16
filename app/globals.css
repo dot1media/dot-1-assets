@@ -1,0 +1,6 @@
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Archivo',system-ui,-apple-system,sans-serif;background:#f4f0e7;color:#1a1a17;-webkit-font-smoothing:antialiased}
+input,button,select,textarea{font-family:inherit;font-size:inherit}
+::selection{background:#e23b2e;color:#fff}
+
