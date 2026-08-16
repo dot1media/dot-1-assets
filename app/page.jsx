@@ -98,6 +98,10 @@ export default function Page() {
             ))}
           </div>
           <button onClick={() => setSelected(null)} style={{ ...btnSolid, padding: "8px 14px", fontSize: 12.5 }}><Plus size={15} /> Add asset</button>
+          <div title={"Signed in as " + (admin?.email || "")} style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 4, paddingLeft: 10, borderLeft: `1px solid ${LINE}` }}>
+            <div style={{ width: 27, height: 27, borderRadius: "50%", background: INK, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", ...mono, fontSize: 11.5, textTransform: "uppercase", flexShrink: 0 }}>{(admin?.email || "?").charAt(0)}</div>
+            <span style={{ ...mono, fontSize: 11.5, color: STONE, whiteSpace: "nowrap" }}>{admin?.email}</span>
+          </div>
           <button onClick={signOut} title="Sign out" style={{ background: "transparent", border: "none", cursor: "pointer", color: STONE, padding: 6 }}><LogOut size={17} /></button>
         </div>
       </div>
