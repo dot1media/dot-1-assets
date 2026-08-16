@@ -7,6 +7,7 @@ import Dashboard from "../lib/assets/Dashboard";
 import Inventory from "../lib/assets/Inventory";
 import Lifecycle from "../lib/assets/Lifecycle";
 import Packages from "../lib/assets/Packages";
+import CheckedOut from "../lib/assets/CheckedOut";
 import AssetDetail from "../lib/assets/AssetDetail";
 
 export default function Page() {
@@ -94,7 +95,7 @@ export default function Page() {
           </div>
           <div style={{ flex: 1 }} />
           <div style={{ display: "flex", gap: 4 }}>
-            {[["dashboard", "Dashboard"], ["inventory", "Inventory"], ["lifecycle", "Lifecycle"], ["packages", "Packages"]].map(([k, l]) => (
+            {[["dashboard", "Dashboard"], ["inventory", "Inventory"], ["lifecycle", "Lifecycle"], ["packages", "Packages"], ["checkouts", "Checked out"]].map(([k, l]) => (
               <button key={k} onClick={() => setView(k)} style={{ ...mono, fontSize: 11.5, letterSpacing: "0.04em", color: view === k ? INK : STONE, background: view === k ? CREAM : "transparent", border: "none", borderRadius: 8, padding: "8px 13px", cursor: "pointer" }}>{l}</button>
             ))}
           </div>
@@ -116,6 +117,7 @@ export default function Page() {
         {view === "inventory" && <Inventory assets={assets} onOpenAsset={setSelected} />}
         {view === "lifecycle" && <Lifecycle assets={assets} onOpenAsset={setSelected} />}
         {view === "packages" && <Packages assets={assets} businessId={bizId} showToast={showToast} />}
+        {view === "checkouts" && <CheckedOut businessId={bizId} showToast={showToast} />}
       </div>
 
       {selected !== undefined && <AssetDetail asset={selected} businessId={bizId} onClose={() => setSelected(undefined)} onSaved={onSaved} onDeleted={onDeleted} showToast={showToast} />}

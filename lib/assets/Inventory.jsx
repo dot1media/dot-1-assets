@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
-import { INK, BODY, STONE, FAINT, LINE, PAPER, CREAM, RED, mono, money } from "./theme";
+import { INK, BODY, STONE, FAINT, LINE, PAPER, CREAM, RED, WARN, mono, money } from "./theme";
 import { KIND_META, KindTag, Badge, Empty, STATUS_LABEL, COND_COLOR, STATE_COLOR, STATE_LABEL, lifecycleInfo } from "./ui";
 
 const selStyle = { ...mono, fontSize: 11.5, color: BODY, background: PAPER, border: `1px solid ${LINE}`, borderRadius: 8, padding: "7px 10px", cursor: "pointer", outline: "none" };
@@ -67,7 +67,7 @@ export default function Inventory({ assets, onOpenAsset }) {
                       </td>
                       <td style={{ padding: "11px 10px", fontSize: 12.5, color: BODY, whiteSpace: "nowrap" }}>{a.category || <span style={{ color: FAINT }}>—</span>}</td>
                       <td style={{ padding: "11px 10px", ...mono, fontSize: 11, color: STONE, maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.identifier || "—"}</td>
-                      <td style={{ padding: "11px 10px", ...mono, fontSize: 12, color: BODY, textAlign: "right" }}>{a.quantity}</td>
+                      <td style={{ padding: "11px 10px", ...mono, fontSize: 12, color: BODY, textAlign: "right" }}>{a.quantity}{Number(a.out_count) > 0 && <div style={{ fontSize: 9.5, color: WARN, marginTop: 2, whiteSpace: "nowrap" }}>{a.out_count} out</div>}</td>
                       <td style={{ padding: "11px 10px", ...mono, fontSize: 12, color: STONE, textAlign: "right" }}>{money(a.unit_cost)}</td>
                       <td style={{ padding: "11px 10px", ...mono, fontSize: 12, color: INK, textAlign: "right", fontWeight: 500 }}>{money(Number(a.unit_cost || 0) * Number(a.quantity || 1))}</td>
                       <td style={{ padding: "11px 10px" }}>{a.condition ? <Badge text={a.condition} color={COND_COLOR[a.condition] || STONE} subtle /> : <span style={{ color: FAINT, fontSize: 12 }}>—</span>}</td>

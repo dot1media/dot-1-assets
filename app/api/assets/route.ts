@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { sql } from "@/lib/db";
 import { verifyToken, ADMIN_COOKIE } from "@/lib/auth";
+import { ensureCheckoutTables } from "@/lib/packages";
 
 export const runtime = "nodejs";
 async function guard() { const store = await cookies(); return verifyToken(store.get(ADMIN_COOKIE)?.value); }
@@ -11,7 +12,17 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const businessId = parseInt(searchParams.get("business_id") || "0", 10);
   if (!businessId) return NextResponse.json({ assets: [] });
-  const rows = await sql`SELECT * FROM assets WHERE business_id = ${businessId} ORDER BY name`;
+  await ensureCheckoutTables();
+  const rows = await sql`
+    SELECT a.*, COALESCE(o.out_qty, 0)::int AS out_count
+    FROM assets a
+    LEFT JOIN (
+      SELECT ci.asset_id, SUM(ci.quantity) AS out_qty
+      FROM asset_checkout_items ci JOIN asset_checkouts c ON c.id = ci.checkout_id
+      WHERE c.checked_in_at IS NULL
+      GROUP BY ci.asset_id
+    ) o ON o.asset_id = a.id
+    WHERE a.business_id = ${businessId} ORDER BY a.name`;
   return NextResponse.json({ assets: rows });
 }
 
