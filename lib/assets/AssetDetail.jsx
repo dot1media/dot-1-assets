@@ -6,7 +6,7 @@ import { KIND_META, CONDITIONS, STATUSES, STATUS_LABEL, lifecycleInfo, Badge, ST
 const Lbl = ({ children }) => <div style={{ ...mono, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: STONE, marginBottom: 3 }}>{children}</div>;
 const sel = { ...inputStyle, cursor: "pointer" };
 
-export default function AssetDetail({ asset, businessId, onClose, onSaved, onDeleted, showToast }) {
+export default function AssetDetail({ asset, businessId, categories, onClose, onSaved, onDeleted, showToast }) {
   const isNew = !asset || !asset.id;
   const [f, setF] = useState({
     kind: asset?.kind || "equipment", name: asset?.name || "", category: asset?.category || "",
@@ -19,8 +19,10 @@ export default function AssetDetail({ asset, businessId, onClose, onSaved, onDel
     notes: asset?.notes || "",
   });
   const [busy, setBusy] = useState(false);
+  const [addingCat, setAddingCat] = useState(false);
   const set = (k, v) => setF((p) => ({ ...p, [k]: v }));
   const isSub = f.kind === "software" || f.kind === "service";
+  const catOptions = Array.from(new Set([...(categories || []), asset?.category].filter(Boolean))).sort();
 
   const save = async () => {
     if (!f.name.trim()) { showToast("Give the item a name."); return; }
@@ -65,7 +67,18 @@ export default function AssetDetail({ asset, businessId, onClose, onSaved, onDel
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <div><Lbl>Type</Lbl><select value={f.kind} onChange={(e) => set("kind", e.target.value)} style={sel}><option value="equipment">Equipment</option><option value="software">Software</option><option value="service">Web Service</option></select></div>
-            <div><Lbl>Category</Lbl><input value={f.category} onChange={(e) => set("category", e.target.value)} placeholder="e.g. Cameras & Lenses" style={inputStyle} /></div>
+            <div><Lbl>Category</Lbl>{addingCat ? (
+              <div style={{ display: "flex", gap: 6 }}>
+                <input value={f.category} onChange={(e) => set("category", e.target.value)} placeholder="New category name" style={inputStyle} autoFocus />
+                <button type="button" onClick={() => setAddingCat(false)} title="Back to list" style={{ ...mono, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em", color: STONE, background: "transparent", border: `1px solid ${LINE}`, borderRadius: 8, padding: "0 11px", cursor: "pointer", flexShrink: 0 }}>List</button>
+              </div>
+            ) : (
+              <select value={f.category || ""} onChange={(e) => { if (e.target.value === "__new__") { set("category", ""); setAddingCat(true); } else set("category", e.target.value); }} style={sel}>
+                <option value="">Uncategorized</option>
+                {catOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+                <option value="__new__">\uff0b Add new category\u2026</option>
+              </select>
+            )}</div>
             <div style={{ gridColumn: "1 / -1" }}><Lbl>Name</Lbl><input value={f.name} onChange={(e) => set("name", e.target.value)} placeholder="Item name" style={inputStyle} /></div>
             <div><Lbl>{isSub ? "License key" : "Serial number"}</Lbl><input value={f.identifier} onChange={(e) => set("identifier", e.target.value)} style={inputStyle} /></div>
             <div><Lbl>{isSub ? "Provider / notes" : "Bin / location"}</Lbl><input value={isSub ? f.description : f.bin} onChange={(e) => set(isSub ? "description" : "bin", e.target.value)} style={inputStyle} /></div>

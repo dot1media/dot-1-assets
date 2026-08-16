@@ -120,7 +120,7 @@ export default function Page() {
         {view === "checkouts" && <CheckedOut businessId={bizId} showToast={showToast} />}
       </div>
 
-      {selected !== undefined && <AssetDetail asset={selected} businessId={bizId} onClose={() => setSelected(undefined)} onSaved={onSaved} onDeleted={onDeleted} showToast={showToast} />}
+      {selected !== undefined && <AssetDetail asset={selected} businessId={bizId} categories={Array.from(new Set(assets.map((a) => a.category).filter(Boolean))).sort()} onClose={() => setSelected(undefined)} onSaved={onSaved} onDeleted={onDeleted} showToast={showToast} />}
       {toast && <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", background: INK, color: "#fff", padding: "11px 20px", borderRadius: 10, fontSize: 13, zIndex: 200, boxShadow: "0 8px 24px rgba(0,0,0,0.2)" }}>{toast}</div>}
     </div>
   );
