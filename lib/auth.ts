@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-export const ASSET_COOKIE = "dot1_assets";
+export const ADMIN_COOKIE = "dot1_admin"; // shared cross-suite admin cookie, set by the portal on .dot1.media
 const WEEK_MS = 1000 * 60 * 60 * 24 * 7;
 
 function sign(payloadObj: object): string {
@@ -25,6 +25,10 @@ function verify(token: string | undefined | null, role: string): { email: string
 }
 export function makeToken(email: string): string { return sign({ role: "admin", email, exp: Date.now() + WEEK_MS }); }
 export function verifyToken(token: string | undefined | null) { return verify(token, "admin"); }
+
+export function isDot1Email(email: string): boolean {
+  return /^[^@\s]+@dot1\.media$/i.test(String(email || "").trim());
+}
 
 export function hashPassword(password: string): string {
   const salt = crypto.randomBytes(16).toString("hex");

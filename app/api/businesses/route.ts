@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { sql } from "@/lib/db";
-import { verifyToken, ASSET_COOKIE } from "@/lib/auth";
+import { verifyToken, ADMIN_COOKIE } from "@/lib/auth";
 
 export const runtime = "nodejs";
-async function guard() { const store = await cookies(); return verifyToken(store.get(ASSET_COOKIE)?.value); }
+async function guard() { const store = await cookies(); return verifyToken(store.get(ADMIN_COOKIE)?.value); }
 
 export async function GET() {
   if (!(await guard())) return NextResponse.json({ error: "Not authorized." }, { status: 401 });

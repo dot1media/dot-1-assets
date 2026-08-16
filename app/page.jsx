@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Boxes, ChevronDown, Plus, LogOut } from "lucide-react";
 import { INK, BODY, STONE, FAINT, LINE, PAPER, CREAM, RED, display, mono, sans, btnSolid } from "../lib/assets/theme";
-import { SetupScreen, LoginScreen } from "../lib/assets/Auth";
+import { PortalSignIn } from "../lib/assets/Auth";
 import Dashboard from "../lib/assets/Dashboard";
 import Inventory from "../lib/assets/Inventory";
 import Lifecycle from "../lib/assets/Lifecycle";
@@ -35,11 +35,8 @@ export default function Page() {
         const biz = me.businesses || []; setBusinesses(biz);
         const first = biz.length ? biz[0].id : null; setBizId(first);
         if (first) await loadAssets(first);
-      } else {
-        const s = await fetch("/api/setup").then((r) => r.json()).catch(() => ({ needed: true }));
-        setSetupNeeded(!!s.needed);
       }
-    } catch (e) { setSetupNeeded(true); }
+    } catch (e) {}
     setReady(true);
   };
   useEffect(() => { boot(); }, []);
@@ -66,7 +63,7 @@ export default function Page() {
   const onDeleted = (id) => { setSelected(undefined); setAssets((prev) => prev.filter((x) => x.id !== id)); };
 
   if (!ready) return <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", ...mono, color: FAINT, fontSize: 13 }}>Loading...</div>;
-  if (!admin) return setupNeeded ? <SetupScreen onDone={() => window.location.reload()} /> : <LoginScreen onDone={() => window.location.reload()} />;
+  if (!admin) return <PortalSignIn />;
 
   const currentBiz = businesses.find((b) => b.id === bizId);
 
