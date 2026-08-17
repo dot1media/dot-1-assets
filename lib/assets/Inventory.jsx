@@ -5,26 +5,56 @@ import { KIND_META, KindTag, Badge, Empty, STATUS_LABEL, COND_COLOR, STATE_COLOR
 
 const selStyle = { ...mono, fontSize: 11.5, color: BODY, background: PAPER, border: `1px solid ${LINE}`, borderRadius: 8, padding: "7px 10px", cursor: "pointer", outline: "none" };
 
+function sortVal(a, col) {
+  switch (col) {
+    case "name": return (a.name || "").toLowerCase();
+    case "category": return (a.category || "").toLowerCase();
+    case "identifier": return (a.identifier || "").toLowerCase();
+    case "quantity": return Number(a.quantity || 0);
+    case "unit": return Number(a.unit_cost || 0);
+    case "value": return Number(a.unit_cost || 0) * Number(a.quantity || 1);
+    case "condition": return (a.condition || "").toLowerCase();
+    case "lifecycle": { const d = lifecycleInfo(a).days; return d == null ? Number.POSITIVE_INFINITY : d; }
+    default: return 0;
+  }
+}
+
 export default function Inventory({ assets, onOpenAsset }) {
   const [q, setQ] = useState("");
   const [kind, setKind] = useState("");
   const [cat, setCat] = useState("");
   const [status, setStatus] = useState("");
+  const [sort, setSort] = useState({ col: null, dir: "asc" });
 
   const categories = useMemo(() => Array.from(new Set(assets.map((a) => a.category).filter(Boolean))).sort(), [assets]);
 
   const rows = useMemo(() => {
     const term = q.trim().toLowerCase();
-    return assets.filter((a) => {
+    const list = assets.filter((a) => {
       if (kind && a.kind !== kind) return false;
       if (cat && (a.category || "") !== cat) return false;
       if (status && (a.status || "in_service") !== status) return false;
       if (term && !((a.name || "").toLowerCase().includes(term) || (a.identifier || "").toLowerCase().includes(term) || (a.category || "").toLowerCase().includes(term))) return false;
       return true;
     });
-  }, [assets, q, kind, cat, status]);
+    if (sort.col) {
+      const dir = sort.dir === "asc" ? 1 : -1;
+      list.sort((x, y) => { const vx = sortVal(x, sort.col), vy = sortVal(y, sort.col); return vx < vy ? -dir : vx > vy ? dir : 0; });
+    }
+    return list;
+  }, [assets, q, kind, cat, status, sort]);
 
   const totalValue = rows.reduce((s, a) => s + Number(a.unit_cost || 0) * Number(a.quantity || 1), 0);
+
+  const toggleSort = (col) => setSort((s) => (s.col === col ? { col, dir: s.dir === "asc" ? "desc" : "asc" } : { col, dir: "asc" }));
+  const Th = ({ col, label, style }) => {
+    const active = sort.col === col;
+    return (
+      <th onClick={() => toggleSort(col)} style={{ ...style, cursor: "pointer", userSelect: "none", whiteSpace: "nowrap", color: active ? INK : undefined }}>
+        {label}<span style={{ marginLeft: 5, fontSize: 8, color: active ? RED : FAINT, opacity: active ? 1 : 0.4 }}>{active && sort.dir === "desc" ? "\u25bc" : "\u25b2"}</span>
+      </th>
+    );
+  };
 
   return (
     <div>
@@ -46,14 +76,14 @@ export default function Inventory({ assets, onOpenAsset }) {
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 720 }}>
               <thead>
                 <tr style={{ ...mono, fontSize: 9.5, letterSpacing: "0.12em", textTransform: "uppercase", color: FAINT, textAlign: "left" }}>
-                  <th style={{ padding: "12px 16px", fontWeight: 500 }}>Item</th>
-                  <th style={{ padding: "12px 10px", fontWeight: 500 }}>Category</th>
-                  <th style={{ padding: "12px 10px", fontWeight: 500 }}>Serial / Key</th>
-                  <th style={{ padding: "12px 10px", fontWeight: 500, textAlign: "right" }}>Qty</th>
-                  <th style={{ padding: "12px 10px", fontWeight: 500, textAlign: "right" }}>Unit</th>
-                  <th style={{ padding: "12px 10px", fontWeight: 500, textAlign: "right" }}>Value</th>
-                  <th style={{ padding: "12px 10px", fontWeight: 500 }}>Condition</th>
-                  <th style={{ padding: "12px 16px", fontWeight: 500 }}>Lifecycle</th>
+                  <Th col="name" label="Item" style={{ padding: "12px 16px", fontWeight: 500 }} />
+                  <Th col="category" label="Category" style={{ padding: "12px 10px", fontWeight: 500 }} />
+                  <Th col="identifier" label="Serial / Key" style={{ padding: "12px 10px", fontWeight: 500 }} />
+                  <Th col="quantity" label="Qty" style={{ padding: "12px 10px", fontWeight: 500, textAlign: "right" }} />
+                  <Th col="unit" label="Unit" style={{ padding: "12px 10px", fontWeight: 500, textAlign: "right" }} />
+                  <Th col="value" label="Value" style={{ padding: "12px 10px", fontWeight: 500, textAlign: "right" }} />
+                  <Th col="condition" label="Condition" style={{ padding: "12px 10px", fontWeight: 500 }} />
+                  <Th col="lifecycle" label="Lifecycle" style={{ padding: "12px 16px", fontWeight: 500 }} />
                 </tr>
               </thead>
               <tbody>
