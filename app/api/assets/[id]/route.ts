@@ -6,9 +6,9 @@ import { verifyToken, ADMIN_COOKIE } from "@/lib/auth";
 export const runtime = "nodejs";
 async function guard() { const store = await cookies(); return verifyToken(store.get(ADMIN_COOKIE)?.value); }
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!(await guard())) return NextResponse.json({ error: "Not authorized." }, { status: 401 });
-  const id = parseInt(params.id, 10);
+  const id = parseInt((await params).id, 10);
   const b = await request.json().catch(() => ({}));
   const rows = await sql`UPDATE assets SET
     kind = ${b.kind || "equipment"}, name = ${String(b.name || "").trim()}, category = ${b.category || ""},
@@ -23,9 +23,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   return NextResponse.json({ asset: rows[0] });
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!(await guard())) return NextResponse.json({ error: "Not authorized." }, { status: 401 });
-  const id = parseInt(params.id, 10);
+  const id = parseInt((await params).id, 10);
   await sql`DELETE FROM assets WHERE id = ${id}`;
   return NextResponse.json({ ok: true });
 }

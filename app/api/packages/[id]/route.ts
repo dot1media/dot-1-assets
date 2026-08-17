@@ -7,10 +7,10 @@ import { ensurePackageTables } from "@/lib/packages";
 export const runtime = "nodejs";
 async function guard() { const store = await cookies(); return verifyToken(store.get(ADMIN_COOKIE)?.value); }
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!(await guard())) return NextResponse.json({ error: "Not authorized." }, { status: 401 });
   await ensurePackageTables();
-  const pid = parseInt(params.id, 10);
+  const pid = parseInt((await params).id, 10);
   const pkg = await sql`SELECT * FROM asset_packages WHERE id = ${pid} LIMIT 1`;
   if (pkg.length === 0) return NextResponse.json({ error: "Not found." }, { status: 404 });
   const items = await sql`
@@ -20,10 +20,10 @@ export async function GET(request: Request, { params }: { params: { id: string }
   return NextResponse.json({ package: pkg[0], items });
 }
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!(await guard())) return NextResponse.json({ error: "Not authorized." }, { status: 401 });
   await ensurePackageTables();
-  const pid = parseInt(params.id, 10);
+  const pid = parseInt((await params).id, 10);
   const b = await request.json().catch(() => ({}));
   if (typeof b.name === "string" || typeof b.description === "string") {
     const nm = typeof b.name === "string" ? b.name.trim() : null;
@@ -42,9 +42,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   return NextResponse.json({ ok: true });
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!(await guard())) return NextResponse.json({ error: "Not authorized." }, { status: 401 });
   await ensurePackageTables();
-  await sql`DELETE FROM asset_packages WHERE id = ${parseInt(params.id, 10)}`;
+  await sql`DELETE FROM asset_packages WHERE id = ${parseInt((await params).id, 10)}`;
   return NextResponse.json({ ok: true });
 }
