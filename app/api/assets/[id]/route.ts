@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { sql } from "@/lib/db";
 import { verifyToken, ADMIN_COOKIE } from "@/lib/auth";
+import { requireAssetsSession } from "@/lib/suite";
 
 export const runtime = "nodejs";
-async function guard() { const store = await cookies(); return verifyToken(store.get(ADMIN_COOKIE)?.value); }
+async function guard() { const store = await cookies(); return await requireAssetsSession(store.get(ADMIN_COOKIE)?.value); }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!(await guard())) return NextResponse.json({ error: "Not authorized." }, { status: 401 });
