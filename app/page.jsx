@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Boxes, ChevronDown, Plus, LogOut } from "lucide-react";
-import { INK, BODY, STONE, FAINT, LINE, PAPER, CREAM, RED, display, mono, sans, btnSolid } from "../lib/assets/theme";
+import { Boxes, ChevronDown, Plus, LogOut, Sun, Moon } from "lucide-react";
+import { INK, BODY, STONE, FAINT, LINE, PAPER, CREAM, RED, SOLID, ACCENT, SHADOW, SHADOW_SM, SHADOW_LG, R, R_LG, R_SM, display, mono, sans, btnSolid, tx } from "../lib/assets/theme";
 import { PortalSignIn } from "../lib/assets/Auth";
 import Dashboard from "../lib/assets/Dashboard";
 import Inventory from "../lib/assets/Inventory";
@@ -18,11 +18,20 @@ export default function Page() {
   const [bizId, setBizId] = useState(null);
   const [assets, setAssets] = useState([]);
   const [view, setView] = useState("dashboard");
-  const [selected, setSelected] = useState(undefined); // undefined = closed, null = new, object = edit
+  const [selected, setSelected] = useState(undefined);
   const [toast, setToast] = useState("");
   const [bizMenu, setBizMenu] = useState(false);
+  const [dark, setDark] = useState(false);
 
   const showToast = (m) => { setToast(m); setTimeout(() => setToast(""), 2600); };
+
+  useEffect(() => { setDark(document.documentElement.getAttribute("data-theme") === "dark"); }, []);
+  const toggleTheme = () => {
+    const nd = !dark; setDark(nd);
+    const el = document.documentElement;
+    if (nd) el.setAttribute("data-theme", "dark"); else el.removeAttribute("data-theme");
+    try { localStorage.setItem("d1-theme", nd ? "dark" : "light"); } catch (e) {}
+  };
 
   const loadAssets = async (id) => {
     if (!id) { setAssets([]); return; }
@@ -68,50 +77,51 @@ export default function Page() {
   if (!admin) return <PortalSignIn />;
 
   const currentBiz = businesses.find((b) => b.id === bizId);
+  const TABS = [["dashboard", "Dashboard"], ["inventory", "Inventory"], ["lifecycle", "Lifecycle"], ["packages", "Packages"], ["checkouts", "Checked out"]];
 
   return (
     <div style={{ minHeight: "100vh", ...sans }}>
-      <div style={{ background: PAPER, borderBottom: `1px solid ${LINE}`, position: "sticky", top: 0, zIndex: 40 }}>
-        <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px", display: "flex", alignItems: "center", gap: 16, height: 60 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-            <div style={{ width: 30, height: 30, borderRadius: 8, background: INK, display: "flex", alignItems: "center", justifyContent: "center" }}><Boxes size={17} color="#fff" /></div>
-            <span style={{ ...display, fontSize: 18, fontWeight: 700, color: INK }}>Assets</span>
+      <div style={{ background: "var(--nav)", backdropFilter: "saturate(180%) blur(20px)", WebkitBackdropFilter: "saturate(180%) blur(20px)", borderBottom: `1px solid ${LINE}`, position: "sticky", top: 0, zIndex: 40, transition: tx("background", "border-color") }}>
+        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 24px", display: "flex", alignItems: "center", gap: 14, height: 62 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ width: 31, height: 31, borderRadius: 9, background: SOLID, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: SHADOW_SM }}><Boxes size={17} color="#fff" /></div>
+            <span style={{ ...display, fontSize: 18, fontWeight: 700, color: INK, letterSpacing: "0.01em" }}>Assets</span>
           </div>
           <div style={{ position: "relative" }}>
-            <button onClick={() => setBizMenu((v) => !v)} style={{ display: "flex", alignItems: "center", gap: 7, background: CREAM, border: `1px solid ${LINE}`, borderRadius: 9, padding: "7px 12px", cursor: "pointer", ...mono, fontSize: 12, color: INK }}>
+            <button onClick={() => setBizMenu((v) => !v)} style={{ display: "flex", alignItems: "center", gap: 8, background: CREAM, border: `1px solid ${LINE}`, borderRadius: 10, padding: "7px 12px", cursor: "pointer", ...mono, fontSize: 12, color: INK, transition: tx("border-color", "background") }}>
               <span style={{ width: 7, height: 7, borderRadius: 4, background: currentBiz?.accent || RED }} />
               {currentBiz?.name || "Select"} <ChevronDown size={13} />
             </button>
             {bizMenu && (
-              <div style={{ position: "absolute", top: 42, left: 0, background: PAPER, border: `1px solid ${LINE}`, borderRadius: 10, boxShadow: "0 10px 30px rgba(0,0,0,0.12)", minWidth: 210, padding: 6, zIndex: 50 }}>
+              <div style={{ position: "absolute", top: 44, left: 0, background: PAPER, border: `1px solid ${LINE}`, borderRadius: 12, boxShadow: SHADOW, minWidth: 214, padding: 6, zIndex: 50 }}>
                 {businesses.map((b) => (
-                  <div key={b.id} onClick={() => switchBiz(b.id)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 10px", borderRadius: 7, cursor: "pointer", background: b.id === bizId ? CREAM : "transparent", fontSize: 13, color: INK }}>
+                  <div key={b.id} onClick={() => switchBiz(b.id)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 10px", borderRadius: 8, cursor: "pointer", background: b.id === bizId ? CREAM : "transparent", fontSize: 13, color: INK }}>
                     <span style={{ width: 7, height: 7, borderRadius: 4, background: b.accent || RED }} />{b.name}
                   </div>
                 ))}
-                <div onClick={addBusiness} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 10px", borderRadius: 7, cursor: "pointer", borderTop: `1px solid ${LINE}`, marginTop: 4, ...mono, fontSize: 11.5, color: STONE }}><Plus size={13} /> Add business</div>
+                <div onClick={addBusiness} style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 10px", borderRadius: 8, cursor: "pointer", borderTop: `1px solid ${LINE}`, marginTop: 4, ...mono, fontSize: 11.5, color: STONE }}><Plus size={13} /> Add business</div>
               </div>
             )}
           </div>
           <div style={{ flex: 1 }} />
-          <div style={{ display: "flex", gap: 4 }}>
-            {[["dashboard", "Dashboard"], ["inventory", "Inventory"], ["lifecycle", "Lifecycle"], ["packages", "Packages"], ["checkouts", "Checked out"]].map(([k, l]) => (
-              <button key={k} onClick={() => setView(k)} style={{ ...mono, fontSize: 11.5, letterSpacing: "0.04em", color: view === k ? INK : STONE, background: view === k ? CREAM : "transparent", border: "none", borderRadius: 8, padding: "8px 13px", cursor: "pointer" }}>{l}</button>
+          <div style={{ display: "flex", background: CREAM, border: `1px solid ${LINE}`, borderRadius: 11, padding: 3, gap: 2 }}>
+            {TABS.map(([k, l]) => (
+              <button key={k} onClick={() => setView(k)} style={{ ...mono, fontSize: 11.5, letterSpacing: "0.03em", color: view === k ? INK : STONE, background: view === k ? PAPER : "transparent", boxShadow: view === k ? SHADOW_SM : "none", border: "none", borderRadius: 8, padding: "7px 13px", cursor: "pointer", transition: tx("color", "background", "box-shadow") }}>{l}</button>
             ))}
           </div>
-          <button onClick={() => setSelected(null)} style={{ ...btnSolid, padding: "8px 14px", fontSize: 12.5 }}><Plus size={15} /> Add asset</button>
-          <div title={"Signed in as " + (admin?.email || "")} style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 4, paddingLeft: 10, borderLeft: `1px solid ${LINE}` }}>
-            <div style={{ width: 27, height: 27, borderRadius: "50%", background: INK, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", ...mono, fontSize: 11.5, textTransform: "uppercase", flexShrink: 0 }}>{(admin?.email || "?").charAt(0)}</div>
-            <span style={{ ...mono, fontSize: 11.5, color: STONE, whiteSpace: "nowrap" }}>{admin?.email}</span>
+          <button onClick={() => setSelected(null)} style={{ ...btnSolid, padding: "9px 15px", fontSize: 12.5 }}><Plus size={15} /> Add asset</button>
+          <button onClick={toggleTheme} title="Toggle theme" style={{ background: "transparent", border: "none", cursor: "pointer", color: STONE, padding: 7, borderRadius: 8, display: "grid", placeItems: "center", transition: tx("color", "background") }}>{dark ? <Sun size={17} /> : <Moon size={17} />}</button>
+          <div title={"Signed in as " + (admin?.email || "")} style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: 8, borderLeft: `1px solid ${LINE}` }}>
+            <div style={{ width: 28, height: 28, borderRadius: "50%", background: SOLID, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", ...mono, fontSize: 11.5, textTransform: "uppercase", flexShrink: 0 }}>{(admin?.email || "?").charAt(0)}</div>
           </div>
-          <button onClick={signOut} title="Sign out" style={{ background: "transparent", border: "none", cursor: "pointer", color: STONE, padding: 6 }}><LogOut size={17} /></button>
+          <button onClick={signOut} title="Sign out" style={{ background: "transparent", border: "none", cursor: "pointer", color: STONE, padding: 6, borderRadius: 8, display: "grid", placeItems: "center", transition: tx("color", "background") }}><LogOut size={17} /></button>
         </div>
       </div>
 
-      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "26px 24px 64px" }}>
-        <div style={{ marginBottom: 20 }}>
+      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "28px 24px 72px" }}>
+        <div style={{ marginBottom: 22 }} className="d1-rise">
           <div style={{ ...mono, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: FAINT }}>Asset Management</div>
-          <div style={{ ...display, fontSize: 27, fontWeight: 700, color: INK, marginTop: 3 }}>{currentBiz?.name || "Assets"}</div>
+          <div style={{ ...display, fontSize: 28, fontWeight: 700, color: INK, marginTop: 4, letterSpacing: "-0.01em" }}>{currentBiz?.name || "Assets"}</div>
         </div>
         {view === "dashboard" && <Dashboard assets={assets} onOpenAsset={setSelected} onGoLifecycle={() => setView("lifecycle")} />}
         {view === "inventory" && <Inventory assets={assets} onOpenAsset={setSelected} />}
@@ -121,8 +131,7 @@ export default function Page() {
       </div>
 
       {selected !== undefined && <AssetDetail asset={selected} businessId={bizId} categories={Array.from(new Set(assets.map((a) => a.category).filter(Boolean))).sort()} onClose={() => setSelected(undefined)} onSaved={onSaved} onDeleted={onDeleted} showToast={showToast} />}
-      {toast && <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", background: INK, color: "#fff", padding: "11px 20px", borderRadius: 10, fontSize: 13, zIndex: 200, boxShadow: "0 8px 24px rgba(0,0,0,0.2)" }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", background: "var(--toast)", color: "var(--toast-fg)", padding: "12px 20px", borderRadius: 12, fontSize: 13, zIndex: 200, boxShadow: SHADOW_LG }}>{toast}</div>}
     </div>
   );
 }
-

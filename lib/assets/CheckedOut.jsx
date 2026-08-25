@@ -4,7 +4,7 @@ import { INK, STONE, FAINT, LINE, PAPER, CREAM, RED, OK, WARN, DANGER, display, 
 
 const Lbl = ({ children }) => <div style={{ ...mono, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: STONE, marginBottom: 3 }}>{children}</div>;
 const overlay = { position: "fixed", inset: 0, background: "rgba(26,26,23,0.4)", zIndex: 100, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "40px 16px", overflowY: "auto" };
-const modalCard = { background: PAPER, borderRadius: 16, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" };
+const modalCard = { background: PAPER, borderRadius: 18, boxShadow: "var(--shadow-sm)", width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" };
 const modalHead = { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px", borderBottom: `1px solid ${LINE}` };
 const modalFoot = { display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 10, padding: "16px 24px", borderTop: `1px solid ${LINE}` };
 const xBtn = { background: "transparent", border: "none", cursor: "pointer", color: STONE, padding: 4 };

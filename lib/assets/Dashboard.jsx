@@ -5,8 +5,8 @@ import { KIND_META, lifecycleInfo, Badge, KindTag, STATE_COLOR, STATE_LABEL, CON
 
 function Kpi({ icon: Icon, label, value, sub, color }) {
   return (
-    <div style={{ background: PAPER, border: `1px solid ${LINE}`, borderRadius: 14, padding: "18px 20px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 7, ...mono, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: STONE, marginBottom: 10 }}><Icon size={13} color={color || STONE} /> {label}</div>
+    <div style={{ background: PAPER, border: `1px solid ${LINE}`, borderRadius: 18, boxShadow: "var(--shadow-sm)", padding: "18px 20px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 7, ...mono, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: STONE, marginBottom: 10 }}><Icon size={13} style={{ color: color || STONE }} /> {label}</div>
       <div style={{ ...display, fontSize: 30, fontWeight: 700, color: INK, lineHeight: 1 }}>{value}</div>
       {sub && <div style={{ fontSize: 12, color: FAINT, marginTop: 6 }}>{sub}</div>}
     </div>
@@ -95,14 +95,14 @@ export default function Dashboard({ assets, onOpenAsset, onGoLifecycle }) {
   return (
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 16 }}>
-        <Kpi icon={Package} label="Line items" value={assets.length} sub={`${stats.totalUnits} total units`} color={INK} />
+        <Kpi icon={Package} label="Line items" value={assets.length} sub={`${stats.totalUnits} total units`} style={{ color: INK }} />
         <Kpi icon={DollarSign} label="Inventory value" value={money(stats.totalValue)} sub="replacement cost basis" color={OK} />
         <Kpi icon={KIND_META.equipment.Icon} label="Equipment" value={stats.byKind.equipment || 0} color={KIND_META.equipment.color} />
         <Kpi icon={TrendingUp} label="Software & services" value={(stats.byKind.software || 0) + (stats.byKind.service || 0)} color={KIND_META.software.color} />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 16, alignItems: "start" }}>
-        <div style={{ background: PAPER, border: `1px solid ${LINE}`, borderRadius: 14, padding: 20 }}>
+        <div style={{ background: PAPER, border: `1px solid ${LINE}`, borderRadius: 18, boxShadow: "var(--shadow-sm)", padding: 20 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
             <div style={{ ...display, fontSize: 18, fontWeight: 700, color: INK }}>Lifecycle attention</div>
             <button onClick={onGoLifecycle} style={{ ...mono, fontSize: 11, color: STONE, background: "transparent", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4 }}>All lifecycle <ArrowRight size={12} /></button>
@@ -116,14 +116,14 @@ export default function Dashboard({ assets, onOpenAsset, onGoLifecycle }) {
                 <div style={{ fontSize: 13.5, color: INK, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{a.name}</div>
                 <div style={{ ...mono, fontSize: 10.5, color: FAINT, marginTop: 2 }}>{info.type === "renewal" ? "Renews" : "Replace"} {info.date} · {info.days < 0 ? `${Math.abs(info.days)}d overdue` : `in ${info.days}d`}</div>
               </div>
-              <Badge text={STATE_LABEL[info.state]} color={STATE_COLOR[info.state]} subtle />
+              <Badge text={STATE_LABEL[info.state]} style={{ color: STATE_COLOR[info.state] }} subtle />
             </div>
           ))}
           {stats.alerts.length > 8 && <div style={{ ...mono, fontSize: 11, color: FAINT, marginTop: 12 }}>+ {stats.alerts.length - 8} more in Lifecycle</div>}
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ background: PAPER, border: `1px solid ${LINE}`, borderRadius: 14, padding: 20 }}>
+          <div style={{ background: PAPER, border: `1px solid ${LINE}`, borderRadius: 18, boxShadow: "var(--shadow-sm)", padding: 20 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <div style={{ ...display, fontSize: 17, fontWeight: 700, color: INK }}>By category</div>
               <div style={{ display: "flex", gap: 3, background: CREAM, borderRadius: 8, padding: 3 }}>
@@ -134,7 +134,7 @@ export default function Dashboard({ assets, onOpenAsset, onGoLifecycle }) {
             </div>
             <CatChart cats={stats.cats} maxCat={maxCat} type={catChart} />
           </div>
-          <div style={{ background: PAPER, border: `1px solid ${LINE}`, borderRadius: 14, padding: 20 }}>
+          <div style={{ background: PAPER, border: `1px solid ${LINE}`, borderRadius: 18, boxShadow: "var(--shadow-sm)", padding: 20 }}>
             <div style={{ ...display, fontSize: 17, fontWeight: 700, color: INK, marginBottom: 12 }}>By condition</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {Object.entries(stats.condMap).sort((a, b) => b[1] - a[1]).map(([c, n]) => (

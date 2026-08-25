@@ -48,7 +48,7 @@ export default function AssetDetail({ asset, businessId, categories, onClose, on
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(26,26,23,0.4)", zIndex: 100, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "40px 16px", overflowY: "auto" }}>
-      <div onClick={(e) => e.stopPropagation()} style={{ background: PAPER, borderRadius: 16, width: "100%", maxWidth: 640, boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ background: PAPER, borderRadius: 18, boxShadow: "var(--shadow-sm)", width: "100%", maxWidth: 640, boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 22px", borderBottom: `1px solid ${LINE}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
             <km.Icon size={18} color={km.color} />
@@ -60,7 +60,7 @@ export default function AssetDetail({ asset, businessId, categories, onClose, on
         <div style={{ padding: 22 }}>
           {info && info.state !== "unknown" && (
             <div style={{ display: "flex", alignItems: "center", gap: 10, background: CREAM, borderRadius: 10, padding: "10px 14px", marginBottom: 18 }}>
-              <Badge text={STATE_LABEL[info.state]} color={STATE_COLOR[info.state]} />
+              <Badge text={STATE_LABEL[info.state]} style={{ color: STATE_COLOR[info.state] }} />
               <span style={{ fontSize: 12.5, color: BODY }}>{info.type === "renewal" ? "Renews" : "Replace by"} {info.date} · {info.days < 0 ? `${Math.abs(info.days)} days overdue` : `${info.days} days out`}</span>
             </div>
           )}

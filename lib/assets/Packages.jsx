@@ -59,7 +59,7 @@ function PackageEditor({ pkg, assets, businessId, onClose, onSaved, showToast })
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(26,26,23,0.4)", zIndex: 100, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "40px 16px", overflowY: "auto" }}>
-      <div onClick={(e) => e.stopPropagation()} style={{ background: PAPER, borderRadius: 16, width: "100%", maxWidth: 680, boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ background: PAPER, borderRadius: 18, boxShadow: "var(--shadow-sm)", width: "100%", maxWidth: 680, boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px", borderBottom: `1px solid ${LINE}` }}>
           <div style={{ ...display, fontSize: 20, fontWeight: 700, color: INK, display: "flex", alignItems: "center", gap: 9 }}><Camera size={19} color={RED} /> {isNew ? "New camera package" : "Edit package"}</div>
           <button onClick={onClose} style={{ background: "transparent", border: "none", cursor: "pointer", color: STONE, padding: 4 }}><X size={20} /></button>
@@ -96,7 +96,7 @@ function PackageEditor({ pkg, assets, businessId, onClose, onSaved, showToast })
 
           <div style={{ margin: "22px 0 10px" }}><Lbl>Add from inventory</Lbl></div>
           <div style={{ position: "relative", marginBottom: 10 }}>
-            <Search size={14} color={FAINT} style={{ position: "absolute", left: 11, top: 11 }} />
+            <Search size={14} style={{ color: FAINT }} style={{ position: "absolute", left: 11, top: 11 }} />
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search gear…" style={{ ...inputStyle, paddingLeft: 32 }} />
           </div>
           <div style={{ border: `1px solid ${LINE}`, borderRadius: 10, maxHeight: 220, overflowY: "auto" }}>
@@ -147,7 +147,7 @@ export default function Packages({ assets, businessId, showToast }) {
        packages.length === 0 ? <Empty>No packages yet. Create your first camera package to group the gear a shoot needs.</Empty> :
        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
          {packages.map((p) => (
-           <div key={p.id} onClick={() => setEditing(p)} style={{ background: PAPER, border: `1px solid ${LINE}`, borderRadius: 14, padding: 18, cursor: "pointer" }}>
+           <div key={p.id} onClick={() => setEditing(p)} style={{ background: PAPER, border: `1px solid ${LINE}`, borderRadius: 18, boxShadow: "var(--shadow-sm)", padding: 18, cursor: "pointer" }}>
              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                <Camera size={16} color={RED} />
                <div style={{ ...display, fontSize: 17, fontWeight: 700, color: INK, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>

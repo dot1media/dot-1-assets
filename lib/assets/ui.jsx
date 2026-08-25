@@ -1,6 +1,6 @@
 import React from "react";
 import { Camera, HardDrive, Cloud, Package } from "lucide-react";
-import { INK, BODY, STONE, FAINT, LINE, PAPER, OK, WARN, DANGER, RED, mono, label } from "./theme";
+import { INK, BODY, STONE, FAINT, LINE, PAPER, OK, WARN, DANGER, RED, mono, label, alpha } from "./theme";
 
 export const KIND_META = {
   equipment: { label: "Equipment", color: "#2f74c0", Icon: Camera },
@@ -38,7 +38,7 @@ export function Field({ children, hint }) {
 }
 
 export function Badge({ text, color, subtle }) {
-  return <span style={{ ...mono, fontSize: 10, letterSpacing: "0.06em", textTransform: "uppercase", color: subtle ? color : "#fff", background: subtle ? color + "1a" : color, border: subtle ? `1px solid ${color}55` : "none", borderRadius: 20, padding: "3px 9px", whiteSpace: "nowrap", display: "inline-block" }}>{text}</span>;
+  return <span style={{ ...mono, fontSize: 10, letterSpacing: "0.06em", textTransform: "uppercase", color: subtle ? color : "#fff", background: subtle ? alpha(color, 12) : color, border: subtle ? `1px solid ${alpha(color, 34)}` : "1px solid transparent", borderRadius: 999, padding: "4px 10px", whiteSpace: "nowrap", display: "inline-block" }}>{text}</span>;
 }
 
 export function KindTag({ kind }) {

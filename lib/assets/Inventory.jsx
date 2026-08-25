@@ -60,7 +60,7 @@ export default function Inventory({ assets, onOpenAsset }) {
     <div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", marginBottom: 14 }}>
         <div style={{ position: "relative", flex: "1 1 240px", minWidth: 200 }}>
-          <Search size={15} color={FAINT} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
+          <Search size={15} style={{ color: FAINT }} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, serial, category..." style={{ width: "100%", padding: "9px 12px 9px 34px", border: `1px solid ${LINE}`, borderRadius: 9, fontSize: 13.5, color: INK, background: PAPER, outline: "none" }} />
         </div>
         <select value={kind} onChange={(e) => setKind(e.target.value)} style={selStyle}><option value="">All kinds</option><option value="equipment">Equipment</option><option value="software">Software</option><option value="service">Web Service</option></select>
@@ -71,7 +71,7 @@ export default function Inventory({ assets, onOpenAsset }) {
       <div style={{ ...mono, fontSize: 11, color: STONE, marginBottom: 10, letterSpacing: "0.04em" }}>{rows.length} of {assets.length} items · {money(totalValue)}</div>
 
       {rows.length === 0 ? <Empty>No assets match these filters.</Empty> : (
-        <div style={{ background: PAPER, border: `1px solid ${LINE}`, borderRadius: 14, overflow: "hidden" }}>
+        <div style={{ background: PAPER, border: `1px solid ${LINE}`, borderRadius: 18, boxShadow: "var(--shadow-sm)", overflow: "hidden" }}>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 720 }}>
               <thead>
@@ -100,8 +100,8 @@ export default function Inventory({ assets, onOpenAsset }) {
                       <td style={{ padding: "11px 10px", ...mono, fontSize: 12, color: BODY, textAlign: "right" }}>{a.quantity}{Number(a.out_count) > 0 && <div style={{ fontSize: 9.5, color: WARN, marginTop: 2, whiteSpace: "nowrap" }}>{a.out_count} out</div>}</td>
                       <td style={{ padding: "11px 10px", ...mono, fontSize: 12, color: STONE, textAlign: "right" }}>{money(a.unit_cost)}</td>
                       <td style={{ padding: "11px 10px", ...mono, fontSize: 12, color: INK, textAlign: "right", fontWeight: 500 }}>{money(Number(a.unit_cost || 0) * Number(a.quantity || 1))}</td>
-                      <td style={{ padding: "11px 10px" }}>{a.condition ? <Badge text={a.condition} color={COND_COLOR[a.condition] || STONE} subtle /> : <span style={{ color: FAINT, fontSize: 12 }}>—</span>}</td>
-                      <td style={{ padding: "11px 16px" }}>{info.state === "unknown" ? <span style={{ ...mono, fontSize: 10.5, color: FAINT }}>not set</span> : <Badge text={STATE_LABEL[info.state]} color={STATE_COLOR[info.state]} subtle />}</td>
+                      <td style={{ padding: "11px 10px" }}>{a.condition ? <Badge text={a.condition} style={{ color: COND_COLOR[a.condition] || STONE }} subtle /> : <span style={{ color: FAINT, fontSize: 12 }}>—</span>}</td>
+                      <td style={{ padding: "11px 16px" }}>{info.state === "unknown" ? <span style={{ ...mono, fontSize: 10.5, color: FAINT }}>not set</span> : <Badge text={STATE_LABEL[info.state]} style={{ color: STATE_COLOR[info.state] }} subtle />}</td>
                     </tr>
                   );
                 })}

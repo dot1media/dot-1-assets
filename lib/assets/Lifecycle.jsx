@@ -48,9 +48,9 @@ export default function Lifecycle({ assets, onOpenAsset }) {
         return (
           <div key={key} style={{ marginBottom: 18 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 4 }}>
-              <Icon size={16} color={color} />
+              <Icon size={16} style={{ color: color }} />
               <span style={{ ...display, fontSize: 17, fontWeight: 700, color: INK }}>{label}</span>
-              <Badge text={String(items.length)} color={color} subtle />
+              <Badge text={String(items.length)} style={{ color: color }} subtle />
             </div>
             <div style={{ ...mono, fontSize: 11, color: FAINT, marginBottom: 10 }}>{blurb}</div>
             {items.length === 0 ? (
