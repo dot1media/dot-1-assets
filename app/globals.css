@@ -10,7 +10,7 @@
   --dim:#6f6d65;         /* muted */
   --faint:#9a988f;       /* faint */
   --line:#e2ded4;        /* borders */
-  --accent:#e23b2e;      /* primary (surfaces) */
+  --accent:#b81616;      /* primary (surfaces) */
   --solid:#1a1a17;       /* dark chips: mark, avatar */
   --solid-fg:#ffffff;
   --toast:#1a1a17; --toast-fg:#ffffff;
@@ -28,7 +28,7 @@
   --dim:#9a938a;
   --faint:#6f6a62;
   --line:rgba(244,240,231,.10);
-  --accent:#ef5347;
+  --accent:#e0453a;
   --solid:#ef5347;
   --solid-fg:#ffffff;
   --toast:#2a2520; --toast-fg:#f4f0e7;
