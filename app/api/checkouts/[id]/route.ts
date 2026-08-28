@@ -7,9 +7,10 @@ import { ensureCheckoutTables } from "@/lib/packages";
 
 export const runtime = "nodejs";
 async function guard() { const store = await cookies(); return await requireAssetsSession(store.get(ADMIN_COOKIE)?.value); }
+async function guardWrite() { const s = await guard(); return s && (s as any).role !== "viewer" ? s : null; }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await guard())) return NextResponse.json({ error: "Not authorized." }, { status: 401 });
+  if (!(await guardWrite())) return NextResponse.json({ error: "Read-only access. Your role can view but not change assets." }, { status: 403 });
   await ensureCheckoutTables();
   const id = parseInt((await params).id, 10);
   const b = await request.json().catch(() => ({}));
@@ -19,7 +20,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await guard())) return NextResponse.json({ error: "Not authorized." }, { status: 401 });
+  if (!(await guardWrite())) return NextResponse.json({ error: "Read-only access. Your role can view but not change assets." }, { status: 403 });
   await ensureCheckoutTables();
   await sql`DELETE FROM asset_checkouts WHERE id = ${parseInt((await params).id, 10)}`;
   return NextResponse.json({ ok: true });

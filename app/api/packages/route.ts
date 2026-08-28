@@ -7,6 +7,7 @@ import { ensurePackageTables } from "@/lib/packages";
 
 export const runtime = "nodejs";
 async function guard() { const store = await cookies(); return await requireAssetsSession(store.get(ADMIN_COOKIE)?.value); }
+async function guardWrite() { const s = await guard(); return s && (s as any).role !== "viewer" ? s : null; }
 
 export async function GET(request: Request) {
   if (!(await guard())) return NextResponse.json({ error: "Not authorized." }, { status: 401 });
@@ -29,7 +30,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (!(await guard())) return NextResponse.json({ error: "Not authorized." }, { status: 401 });
+  if (!(await guardWrite())) return NextResponse.json({ error: "Read-only access. Your role can view but not change assets." }, { status: 403 });
   await ensurePackageTables();
   const b = await request.json().catch(() => ({}));
   const businessId = parseInt(String(b.business_id || "0"), 10);

@@ -6,6 +6,7 @@ import { requireAssetsSession } from "@/lib/suite";
 
 export const runtime = "nodejs";
 async function guard() { const store = await cookies(); return await requireAssetsSession(store.get(ADMIN_COOKIE)?.value); }
+async function guardWrite() { const s = await guard(); return s && (s as any).role !== "viewer" ? s : null; }
 
 export async function GET() {
   if (!(await guard())) return NextResponse.json({ error: "Not authorized." }, { status: 401 });
@@ -14,7 +15,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!(await guard())) return NextResponse.json({ error: "Not authorized." }, { status: 401 });
+  if (!(await guardWrite())) return NextResponse.json({ error: "Read-only access. Your role can view but not change assets." }, { status: 403 });
   const b = await request.json().catch(() => ({}));
   const name = String(b.name || "").trim();
   if (!name) return NextResponse.json({ error: "Business name is required." }, { status: 400 });
