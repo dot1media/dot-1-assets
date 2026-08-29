@@ -20,6 +20,8 @@ function verify(token: string | undefined | null, role: string): { email: string
   try {
     const p = JSON.parse(Buffer.from(body, "base64url").toString());
     if (p.role !== role || typeof p.exp !== "number" || Date.now() > p.exp) return null;
+    const floor = Number(process.env.SESSION_MIN_IAT || 0);
+    if (floor && (typeof p.iat !== "number" || p.iat < floor)) return null;
     return { email: String(p.email || "") };
   } catch { return null; }
 }
