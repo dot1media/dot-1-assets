@@ -21,6 +21,9 @@ export async function ensurePackageTables(): Promise<void> {
     UNIQUE (package_id, asset_id)
   )`;
   await sql`CREATE INDEX IF NOT EXISTS idx_package_items_package ON asset_package_items(package_id)`;
+  // Session types this kit is for (free text / comma-separated), so packages organize by the
+  // portal session types they serve and the portal can match them up.
+  await sql`ALTER TABLE asset_packages ADD COLUMN IF NOT EXISTS session_types TEXT DEFAULT ''`;
   ensured = true;
 }
 

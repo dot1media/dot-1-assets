@@ -27,11 +27,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   await ensurePackageTables();
   const pid = parseInt((await params).id, 10);
   const b = await request.json().catch(() => ({}));
-  if (typeof b.name === "string" || typeof b.description === "string") {
+  if (typeof b.name === "string" || typeof b.description === "string" || typeof b.session_types === "string") {
     const nm = typeof b.name === "string" ? b.name.trim() : null;
     if (typeof b.name === "string" && !nm) return NextResponse.json({ error: "Name can't be empty." }, { status: 400 });
     const desc = typeof b.description === "string" ? b.description : null;
-    await sql`UPDATE asset_packages SET name = COALESCE(${nm}, name), description = COALESCE(${desc}, description), updated_at = now() WHERE id = ${pid}`;
+    const st = typeof b.session_types === "string" ? b.session_types : null;
+    await sql`UPDATE asset_packages SET name = COALESCE(${nm}, name), description = COALESCE(${desc}, description), session_types = COALESCE(${st}, session_types), updated_at = now() WHERE id = ${pid}`;
   }
   if (Array.isArray(b.items)) {
     await sql`DELETE FROM asset_package_items WHERE package_id = ${pid}`;

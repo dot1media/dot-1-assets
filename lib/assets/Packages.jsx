@@ -10,6 +10,7 @@ function PackageEditor({ pkg, assets, businessId, onClose, onSaved, showToast })
   const isNew = !pkg || !pkg.id;
   const [name, setName] = useState(pkg?.name || "");
   const [description, setDescription] = useState(pkg?.description || "");
+  const [sessionTypes, setSessionTypes] = useState(pkg?.session_types || "");
   const [items, setItems] = useState([]); // [{ asset_id, quantity }]
   const [loaded, setLoaded] = useState(isNew);
   const [busy, setBusy] = useState(false);
@@ -39,14 +40,14 @@ function PackageEditor({ pkg, assets, businessId, onClose, onSaved, showToast })
     setBusy(true);
     try {
       if (isNew) {
-        const res = await fetch("/api/packages", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ business_id: businessId, name: name.trim(), description: description.trim() }) });
+        const res = await fetch("/api/packages", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ business_id: businessId, name: name.trim(), description: description.trim(), session_types: sessionTypes.trim() }) });
         const d = await res.json().catch(() => ({}));
         if (res.ok && d.package) {
           await fetch(`/api/packages/${d.package.id}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ items }) });
           showToast("Package created."); onSaved();
         } else { showToast(d.error || "Could not create."); setBusy(false); }
       } else {
-        const res = await fetch(`/api/packages/${pkg.id}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: name.trim(), description: description.trim(), items }) });
+        const res = await fetch(`/api/packages/${pkg.id}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: name.trim(), description: description.trim(), session_types: sessionTypes.trim(), items }) });
         const d = await res.json().catch(() => ({}));
         if (res.ok) { showToast("Package saved."); onSaved(); } else { showToast(d.error || "Could not save."); setBusy(false); }
       }
@@ -70,6 +71,10 @@ function PackageEditor({ pkg, assets, businessId, onClose, onSaved, showToast })
           <div style={{ height: 12 }} />
           <Lbl>Description</Lbl>
           <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Optional, what this kit is for" style={inputStyle} />
+          <div style={{ height: 12 }} />
+          <Lbl>Session types</Lbl>
+          <input value={sessionTypes} onChange={(e) => setSessionTypes(e.target.value)} placeholder="e.g. Mini Session, Portrait, Event" style={inputStyle} />
+          <div style={{ ...mono, fontSize: 10, color: FAINT, marginTop: 4, lineHeight: 1.5 }}>Which session types this kit is for. Comma-separated. Shows on the shoot in the portal so the right gear is one tap away.</div>
 
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", margin: "22px 0 10px" }}>
             <Lbl>In this package ({items.length})</Lbl>
@@ -152,7 +157,8 @@ export default function Packages({ assets, businessId, showToast }) {
                <Camera size={16} color={RED} />
                <div style={{ ...display, fontSize: 17, fontWeight: 700, color: INK, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
              </div>
-             {p.description ? <div style={{ fontSize: 12.5, color: STONE, lineHeight: 1.5, marginBottom: 12 }}>{p.description}</div> : <div style={{ height: 6 }} />}
+             {p.description ? <div style={{ fontSize: 12.5, color: STONE, lineHeight: 1.5, marginBottom: p.session_types ? 8 : 12 }}>{p.description}</div> : <div style={{ height: 6 }} />}
+             {p.session_types ? <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 12 }}>{String(p.session_types).split(",").map((t) => t.trim()).filter(Boolean).map((t, i) => <span key={i} style={{ ...mono, fontSize: 9.5, letterSpacing: "0.04em", color: RED, background: CREAM, border: `1px solid ${LINE}`, borderRadius: 999, padding: "2px 9px" }}>{t}</span>)}</div> : null}
              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", ...mono, fontSize: 11, color: STONE, borderTop: `1px solid ${LINE}`, paddingTop: 12, marginTop: 6 }}>
                <span>{p.item_count} items · {p.unit_count} units</span>
                <span style={{ color: INK }}>{money(Number(p.total_value))}</span>

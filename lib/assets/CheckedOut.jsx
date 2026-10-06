@@ -12,9 +12,9 @@ const xBtn = { background: "transparent", border: "none", cursor: "pointer", col
 function fmtDate(d) { if (!d) return ""; try { return new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric" }); } catch (e) { return String(d); } }
 function daysUntil(d) { if (!d) return null; return Math.ceil((new Date(String(d).slice(0, 10) + "T00:00:00").getTime() - Date.now()) / 86400000); }
 
-function CheckoutDialog({ packages, businessId, onClose, onDone, showToast }) {
-  const [packageId, setPackageId] = useState(packages[0]?.id || "");
-  const [label, setLabel] = useState("");
+function CheckoutDialog({ packages, businessId, onClose, onDone, showToast, initialPackageId, initialLabel }) {
+  const [packageId, setPackageId] = useState(initialPackageId || packages[0]?.id || "");
+  const [label, setLabel] = useState(initialLabel || "");
   const [dueBack, setDueBack] = useState("");
   const [busy, setBusy] = useState(false);
   const checkout = async () => {
@@ -58,11 +58,12 @@ function CheckoutDialog({ packages, businessId, onClose, onDone, showToast }) {
   );
 }
 
-export default function CheckedOut({ businessId, showToast }) {
+export default function CheckedOut({ businessId, showToast, autoCheckout, onAutoHandled }) {
   const [checkouts, setCheckouts] = useState([]);
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialog, setDialog] = useState(false);
+  const [prefill, setPrefill] = useState(null); // { packageId, label } from a portal deep link
 
   const load = async () => {
     setLoading(true);
@@ -76,6 +77,15 @@ export default function CheckedOut({ businessId, showToast }) {
     setLoading(false);
   };
   useEffect(() => { if (businessId) load(); }, [businessId]);
+
+  // Opened from the portal's "Check out in Assets" button (?checkout=<id>&for=<label>).
+  useEffect(() => {
+    if (!loading && autoCheckout && autoCheckout.packageId) {
+      setPrefill({ packageId: autoCheckout.packageId, label: autoCheckout.label || "" });
+      setDialog(true);
+      if (onAutoHandled) onAutoHandled();
+    }
+  }, [loading, autoCheckout]);
 
   const checkIn = async (id) => {
     try { const res = await fetch(`/api/checkouts/${id}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ checkin: true }) }); if (res.ok) { showToast("Checked back in."); load(); } else showToast("Could not check in."); } catch (e) { showToast("Network error."); }
@@ -139,7 +149,7 @@ export default function CheckedOut({ businessId, showToast }) {
         </>
       )}
 
-      {dialog && <CheckoutDialog packages={packages} businessId={businessId} onClose={() => setDialog(false)} onDone={() => { setDialog(false); load(); }} showToast={showToast} />}
+      {dialog && <CheckoutDialog packages={packages} businessId={businessId} initialPackageId={prefill?.packageId} initialLabel={prefill?.label} onClose={() => { setDialog(false); setPrefill(null); }} onDone={() => { setDialog(false); setPrefill(null); load(); }} showToast={showToast} />}
     </div>
   );
 }

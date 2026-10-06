@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   const businessId = parseInt(searchParams.get("business_id") || "0", 10);
   if (!businessId) return NextResponse.json({ packages: [] });
   const rows = await sql`
-    SELECT p.id, p.name, p.description, p.created_at,
+    SELECT p.id, p.name, p.description, p.session_types, p.created_at,
       COALESCE(COUNT(pi.id), 0)::int AS item_count,
       COALESCE(SUM(pi.quantity), 0)::int AS unit_count,
       COALESCE(SUM(pi.quantity * a.unit_cost), 0) AS total_value
@@ -37,6 +37,6 @@ export async function POST(request: Request) {
   if (!businessId) return NextResponse.json({ error: "business_id is required." }, { status: 400 });
   const name = String(b.name || "").trim();
   if (!name) return NextResponse.json({ error: "Name is required." }, { status: 400 });
-  const rows = await sql`INSERT INTO asset_packages (business_id, name, description) VALUES (${businessId}, ${name}, ${String(b.description || "")}) RETURNING *`;
+  const rows = await sql`INSERT INTO asset_packages (business_id, name, description, session_types) VALUES (${businessId}, ${name}, ${String(b.description || "")}, ${String(b.session_types || "")}) RETURNING *`;
   return NextResponse.json({ package: rows[0] });
 }

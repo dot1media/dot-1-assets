@@ -22,8 +22,23 @@ export default function Page() {
   const [toast, setToast] = useState("");
   const [bizMenu, setBizMenu] = useState(false);
   const [dark, setDark] = useState(false);
+  const [autoCheckout, setAutoCheckout] = useState(null); // deep link from the portal: { packageId, label }
 
   const showToast = (m) => { setToast(m); setTimeout(() => setToast(""), 2600); };
+
+  // Deep link from the portal's "Check out in Assets" button: ?checkout=<packageId>&for=<label>
+  useEffect(() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      const cid = sp.get("checkout");
+      if (cid) {
+        setAutoCheckout({ packageId: parseInt(cid, 10), label: sp.get("for") || "" });
+        setView("checkouts");
+        const url = new URL(window.location.href); url.searchParams.delete("checkout"); url.searchParams.delete("for");
+        window.history.replaceState({}, "", url.pathname + url.search);
+      }
+    } catch (e) {}
+  }, []);
 
   useEffect(() => { setDark(document.documentElement.getAttribute("data-theme") === "dark"); }, []);
   const toggleTheme = () => {
@@ -127,7 +142,7 @@ export default function Page() {
         {view === "inventory" && <Inventory assets={assets} onOpenAsset={setSelected} />}
         {view === "lifecycle" && <Lifecycle assets={assets} onOpenAsset={setSelected} />}
         {view === "packages" && <Packages assets={assets} businessId={bizId} showToast={showToast} />}
-        {view === "checkouts" && <CheckedOut businessId={bizId} showToast={showToast} />}
+        {view === "checkouts" && <CheckedOut businessId={bizId} showToast={showToast} autoCheckout={autoCheckout} onAutoHandled={() => setAutoCheckout(null)} />}
       </div>
 
       {selected !== undefined && <AssetDetail asset={selected} businessId={bizId} categories={Array.from(new Set(assets.map((a) => a.category).filter(Boolean))).sort()} onClose={() => setSelected(undefined)} onSaved={onSaved} onDeleted={onDeleted} showToast={showToast} />}
