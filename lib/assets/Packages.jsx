@@ -133,6 +133,7 @@ export default function Packages({ assets, businessId, showToast }) {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(undefined); // undefined = closed, null = new, obj = edit
+  const [seeding, setSeeding] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -141,11 +142,30 @@ export default function Packages({ assets, businessId, showToast }) {
   };
   useEffect(() => { if (businessId) load(); }, [businessId]);
 
+  const createStarterKits = async () => {
+    setSeeding(true);
+    try {
+      const res = await fetch("/api/packages/starter", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ business_id: businessId }) });
+      const d = await res.json().catch(() => ({}));
+      if (res.ok && d.ok) {
+        const made = (d.created || []).length;
+        const items = (d.created || []).reduce((n, k) => n + (k.items || 0), 0);
+        if (made === 0) showToast("Starter kits already exist — nothing to add.");
+        else showToast(`Created ${made} starter kit${made === 1 ? "" : "s"} with ${items} item${items === 1 ? "" : "s"} matched from inventory. Open each to review and adjust.`);
+        load();
+      } else showToast(d.error || "Could not create starter kits.");
+    } catch (e) { showToast("Network error."); }
+    setSeeding(false);
+  };
+
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 18, gap: 16 }}>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 18, gap: 16, flexWrap: "wrap" }}>
         <div style={{ maxWidth: 560, fontSize: 13, color: STONE, lineHeight: 1.5 }}>Build reusable gear kits from your inventory. Attach them to session types in the portal so every shoot knows what to pack.</div>
-        <button onClick={() => setEditing(null)} style={{ ...btnSolid, padding: "9px 15px", fontSize: 12.5, flexShrink: 0 }}><Plus size={15} /> New package</button>
+        <div style={{ display: "flex", gap: 8, flexShrink: 0, flexWrap: "wrap" }}>
+          <button onClick={createStarterKits} disabled={seeding} title="Create the four standard photography kits, auto-filled from your inventory" style={{ ...btnGhost, padding: "9px 14px", fontSize: 12.5, display: "inline-flex", alignItems: "center", gap: 7 }}><Camera size={15} /> {seeding ? "Creating…" : "Create starter kits"}</button>
+          <button onClick={() => setEditing(null)} style={{ ...btnSolid, padding: "9px 15px", fontSize: 12.5 }}><Plus size={15} /> New package</button>
+        </div>
       </div>
 
       {loading ? <div style={{ ...mono, fontSize: 12, color: FAINT, padding: 20 }}>Loading…</div> :
